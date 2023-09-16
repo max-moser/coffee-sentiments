@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Coffee sentiment</title>
+    </head>
+    <body>
+        <h1>Coffee sentiments</h1>
+        <article>
+            {%- for coffee_variant in votes %}
+                {%- set vote_list = votes[coffee_variant] %}
+                <h2>{{ coffee_variant }} ({{ vote_list | summarize_votes }})</h2>
+                {%- for vote in vote_list %}
+                <ul>
+                    <li>
+                        {{ vote.name }}: {{ vote.vote | display_vote }}
+                    </li>
+                </ul>
+                {%- endfor %}
+            {%- endfor %}
+        </article>
+    </body>
+</html>
