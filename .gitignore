@@ -1,1 +1,4 @@
 instance/coffee.db
+ssl/ssl.crt
+ssl/ssl.key
+.env
