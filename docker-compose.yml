@@ -1,0 +1,17 @@
+version: "3"
+services:
+  coffee:
+    build: .
+    environment:
+      - COFFEE_ADMIN_TOKEN
+      - COFFEE_SECRET_KEY=${COFFEE_SECRET_KEY:-CHANGE_ME}
+      - COFFEE_SQLALCHEMY_DATABASE_URI=sqlite:////var/coffee/instance/coffee.db
+      - PYTHONUNBUFFERED=TRUE
+    ports:
+      - "443:5000"
+    volumes:
+      - ./ssl:/var/coffee/ssl
+      - db:/var/coffee/instance
+
+volumes:
+  db:
