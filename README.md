@@ -21,6 +21,14 @@ A containerized setup is also available through `docker compose up`.
 The service will be available on port `443`.
 
 
+### HTTPS
+
+In order to use TLS/SSL, a proper key pair should be placed in `ssl/ssl.{key,crt}`.
+
+If no such key pair is present, the provided test key pair (`ssl/test.{key,crt}`) will be used by `start.sh` as a fallback.
+That is sufficient for development/testing purposes on localhost, but obviously not for an actual deployment.
+
+
 ## Usage
 
 ### Web UI
