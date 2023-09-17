@@ -1,0 +1,21 @@
+*, html {
+    background-color: #1d1c19 !important;
+    color: #fffddd;
+}
+span.vote.like {
+    color: rgb(188, 244, 148) !important;
+}
+span.vote.dislike, .flash.error {
+    color: rgb(190, 69, 56) !important;
+}
+a {
+    color: #7399be !important;
+    text-decoration: none;
+    font-weight: bold;
+}
+ul {
+    list-style: circle;
+}
+ul.flashes {
+    list-style: none;
+}

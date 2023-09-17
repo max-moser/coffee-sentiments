@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vote for {{ coffee_variant }}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    </head>
+    <body>
+        {%- with messages = get_flashed_messages(with_categories=true) %}
+            {%- if messages %}
+                <ul class="flashes">
+                {%- for category, message in messages %}
+                    <li class="flash {{ category }}">{{ message }}</li>
+                {%- endfor %}
+                </ul>
+            {%- endif %}
+        {%- endwith %}
+        <h1>Vote for {{ coffee_variant }}</h1>
+        <form method="POST">
+            <p>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Max Mustermann" />
+            </p>
+            <p>
+                <label for="vote">Evaluation</label>
+                <select id="vote" name="vote">
+                    <option value="1" selected>Like</option>
+                    <option value="0">Dislike</option>
+                </select>
+            </p>
+            <p>
+                <input type="submit" value="Vote" />
+            </p>
+        </form>
+
+        <a href="{{ url_for('show_overview') }}"><button>Back</button></a>
+    </body>
+</html>

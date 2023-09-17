@@ -2,16 +2,30 @@ from enum import IntEnum
 from typing import Dict, List, Tuple
 from uuid import uuid4
 
-from flask import Flask, current_app, jsonify, render_template, request
+from flask import (
+    Flask,
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
 app = Flask("coffee")
 app.config.from_pyfile("coffee.cfg")
+app.config.from_prefixed_env("COFFEE")
 app.template_folder = "templates"
+app.static_folder = "static"
 sa = SQLAlchemy(app)
 
-if "ADMIN_TOKEN" not in app.config:
+if app.config.get("SECRET_KEY", None) is None:
+    raise RuntimeError("The application config has no SECRET_KEY value")
+
+if app.config.get("ADMIN_TOKEN", None) is None:
     token = str(uuid4())
     print(f"admin token: {token}")
     app.config["ADMIN_TOKEN"] = token
@@ -90,7 +104,7 @@ def display_vote(vote: VoteEnum) -> str:
     elif vote == VoteEnum.Downvote:
         value = "dislike"
 
-    return value
+    return f"<span class='vote {value}'>{value}</span>"
 
 
 @app.route("/")
@@ -99,7 +113,42 @@ def show_overview():
     return render_template("overview.jinja", votes=votes)
 
 
-@app.route("/export")
+@app.route("/vote/<string:coffee_variant>", methods=["GET", "POST"])
+def vote_form(coffee_variant: str):
+    if request.method == "POST":
+        success = True
+        try:
+            values = request.values.to_dict()
+            vote = VoteEnum(int(values["vote"]))
+            name = values["name"]
+
+            success, message = _add_vote(coffee_variant, name, vote)
+            if success:
+                flash(message, "message")
+                return redirect(url_for("show_overview"))
+            else:
+                flash(message, "error")
+
+        except KeyError as e:
+            flash(f"missing the required value for {e}", "error")
+
+        except ValueError:
+            flash("unexpected value for the vote", "error")
+
+        except Exception as e:
+            current_app.logger.error(e)
+            flash("unexpected error", "error")
+
+        return (
+            render_template("vote_form.jinja", coffee_variant=coffee_variant),
+            400,
+        )
+
+    else:
+        return render_template("vote_form.jinja", coffee_variant=coffee_variant)
+
+
+@app.route("/api/export")
 def export():
     votes = {
         variant: {
@@ -110,7 +159,7 @@ def export():
     return jsonify(votes)
 
 
-@app.route("/variants", methods=["POST"])
+@app.route("/api/variants", methods=["POST"])
 def add_coffee_variant():
     try:
         values = request.values.to_dict()
@@ -141,7 +190,7 @@ def add_coffee_variant():
         return jsonify({"message": e}), 400
 
 
-@app.route("/vote", methods=["POST"])
+@app.route("/api/vote", methods=["POST"])
 def add_vote():
     try:
         values = request.values.to_dict()

@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Coffee sentiment</title>
+        <title>Coffee sentiments</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
     </head>
     <body>
+        {%- with messages = get_flashed_messages(with_categories=true) %}
+            {%- if messages %}
+                <ul class="flashes">
+                {%- for category, message in messages %}
+                    <li class="flash {{ category }}">{{ message }}</li>
+                {%- endfor %}
+                </ul>
+            {%- endif %}
+        {%- endwith %}
         <h1>Coffee sentiments</h1>
         <article>
             {%- for coffee_variant in votes %}
                 {%- set vote_list = votes[coffee_variant] %}
-                <h2>{{ coffee_variant }} ({{ vote_list | summarize_votes }})</h2>
+                <h2>{{ coffee_variant }} ({{ vote_list | summarize_votes }}) &ndash; <a href="{{ url_for('vote_form', coffee_variant=coffee_variant) }}">vote</a></h2>
                 {%- for vote in vote_list %}
                 <ul>
                     <li>
